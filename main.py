@@ -54,7 +54,7 @@ def get_code(node, prefix="", code={}):
     
     # print(f"node data: {node.data}; prefix: {prefix}; code: {code}\n")
     # base case >>> leaf
-    if node.children() == None:
+    if all([child is None for child in node.children()]):
         letter = node.data[1]
         code[letter] = prefix
         return code
@@ -102,5 +102,5 @@ T = make_huffman_tree(f)
 C = get_code(T)
 print("Huffman cost:  %d" % huffman_cost(C, f))
 
-print(f)
-print(sorted(C.items(), key=lambda item: len(item[1])))
+# print(f)
+# print(sorted(C.items(), key=lambda item: len(item[1])))
