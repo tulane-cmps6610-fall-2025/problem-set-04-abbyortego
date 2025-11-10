@@ -48,11 +48,8 @@ def make_huffman_tree(f):
     return p.get()
 # make_huffman_tree
 
-# TODO: perform a traversal on the prefix code tree to collect all encodings
-def get_code(node, prefix="", code={}):
-    # perform a tree traversal and collect encodings for leaves in code
-    
-    # print(f"node data: {node.data}; prefix: {prefix}; code: {code}\n")
+# perform a traversal on the prefix code tree to collect all encodings
+def get_code(node, prefix="", code={}):    
     # base case >>> leaf
     if all([child is None for child in node.children()]):
         letter = node.data[1]
