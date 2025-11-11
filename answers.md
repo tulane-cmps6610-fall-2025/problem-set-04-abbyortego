@@ -67,7 +67,7 @@ Place all written answers from `problemset-04.md` here for easier grading.
     - **Work Analysis**: This method yields $W(n) = O(n)$ due to how the nodes are distributed throughout the tree. 
         - The worst case is a node traversing the entire tree before it found its proper spot and it would take $O(\log n)$ work to do so. This could only happen with one node though, the root. 
         - Using this bottom-up approach, each level would increase the depth a misplaced node may have to travel, but the number of possible nodes that could do this would decrease significantly. 
-        - This means the overall amount of work would decrease as well and can be bounded by just $O(n)$ work.
+        - This means the total amount of work can be bounded by just $O(n)$.
 
 - **2b.**
     - **Span Analysis**: For the proposed method the span would be $S(n) = O(\log n)$.
@@ -119,35 +119,34 @@ Place all written answers from `problemset-04.md` here for easier grading.
         - Therefore, $O = O'$ and an optimal solution can be created from the optimal solutions to smaller subproblems.
 
 - **3c.**
-    - **Work Analysis**: The work is $O(n \log n)$.
-        - First, the set of denominations would be sorted highest to lowest which would take $O(n \log n)$ work. 
-        - Then, each denominaiton, $k$, would be considered, adding it to the solution if $N-2^k \leq 0$ which would take $O(n)$ work. 
-        - This yields the grand total $W(n) = O(n \log n + n) = O(n \log n)$.
-    - **Span Analysis**: The span is $O(n)$. 
-        - Sorting with an unlimited number of processors takes $O(\log n)$.
-        - However, like above, each denomination would have to be considered, costing $O(n)$. 
-        - This yields the grand total $S(n) = O(\log n + n) = O(n)$.
+    - **Work Analysis**: The work is $O(n)$.
+        - First, we can assume the set of denominations are already sorted highest to lowest. 
+        - Then, each denominaiton, $k$, would be considered, adding it to the solution if $N-2^k \leq 0$, which would take $O(n)$ work. 
+        - This yields total $W(n) = O(n)$.
+    - **Span Analysis**: The span is $O(n)$
+        - Like above, we can assume the denominations are already sorted highest to lowest.
+        - Also, like above, each denomination would still have to be considered sequentially since a new denomination cannot be chosen without factoring in denominations made previously via the remainder value, $N-2^k \leq 0$. This would cost $O(n)$. 
+        - This yields total $S(n) = O(n)$.
 
 <br>
 
 - **4a.**
     - In Fortuitio, the denominations could be (1, 3, 5, 6). If we're trying to exchange 8 dollars...
-        - The greedy solution is $G = {6, 1, 1}$.
+        - The greedy solution is $G = \{6, 1, 1\}$.
             - Greedy would choose 6, remainder 2
             - Greedy would choose 1, remainder 1
             - Greedy would choose 1, remainder 0
-        - The optimal solution is $O = {5, 3}$.
+        - The optimal solution is $O = \{5, 3\}$.
         - The greedy solution uses 3 coins while the optimal solution can be done with 2. 
 
 - **4b.**
-    - **Optimal Substructure**: This problem still has optimal substructure since an optimal solution for this problem can be constructed from smaller subproblems.
+    - **Optimal Substructure**: Let $OPT(X, N)$ be the optimal solution (smallest number of coins) for any set of denominations, $X$, and any dollar amount, $N$. The optimal substructure is $OPT(X, N) = \min \{1 + OPT(X[1:], N-X[0]), OPT(X[1:], N)\}$.
         - Similar to the proof above, let $X$ equal the set of possible denominations and assume you make an optimal choice, $x \in X$, for which denomination to use. 
         - The optimal solution, $O$, will be made up of $x$ and the optimal solution for the remaining amount of dollars to exchange, $N-x$.
         - Suppose, $O$ was not optimal and that some other solution, $O'$, is. 
         - If $x$ is in the optimal solution, however, it has to be in $O'$. But if $x$ is $O'$, you get the same remainder as before and the same set of subproblems. 
         - Therefore, same as before, $O = O'$ and an optimal solution can be created from the optimal solutions to smaller subproblems.
-    - Let $OPT(X, N)$ be the optimal solution (smallest number of coins) for any set of denominations, $X$, and any dollar amount, $N$.
-        - The optimal substructure is $OPT(X, N) = \min \{1 + OPT(X[1:], N-X[0]), OPT(X[1:], N)\}$.
+    
 
 - **4c.**
     - Let $X$ be the set of possible choices for the number of coins or more precisely, the possible values of $k$. Let $N$ be the dollars to exchange for Fortuito's currency.
@@ -165,8 +164,8 @@ Place all written answers from `problemset-04.md` here for easier grading.
                     return 1 + greedy_exchange_dollars(X, new_N)
                 elif X[0] <= N:     # if denomination can fit in N dollars, decide to use that denomination or not
                     new_N = N-X[0]
-                    use = 1 + greedy_exchange_dollars(X, new_N)
-                    dont_use = 0 + greedy_exchange_dollars(X, N)
+                    use = 1 + greedy_exchange_dollars(X[1:], new_N)
+                    dont_use = 0 + greedy_exchange_dollars(X[1:], N)
                     return min(use, dont_use)
                 else:
                     return 0 + greedy_exchange_dollars(X[1:], N)
@@ -174,37 +173,36 @@ Place all written answers from `problemset-04.md` here for easier grading.
             #
         # dp_exchange_dollars
     - **Work Analysis**: The work is $O(|X| * N)$
-        - The denominations must be sorted by highest to lowest first which takes $O(|X| \log |X|)$ work.
-        - If memoization was used, each subproblem would be calculated sequentially in constant time and the two recursive calls could be looked-up. There are $O(|X| * N)$ subproblems so $W(n) = O(|X| * N)$.
-        - In total, $W(n) = O((|X|*\log |X|) + (|X|*N)) = O(|X| * N)$, assuming the dollars exchanged would end up exceeding the possible denominations.
+        - Assume the denominations are already sorted highest to lowest. 
+        - Then, if memoization was used, each subproblem would be calculated sequentially in constant time and the two recursive calls could be looked-up. There are $O(|X| * N)$ unique subproblems so $W(n) = O(|X| * N)$
+        - In total, $W(n) = O(|X| * N)$, assuming the dollars exchanged wouldn't end up exceeding the possible denominations.
     - **Span Analysis**: The span is $O(|X| + N)$
-        - Similar to the work, the denominations must be sorted by highest to lowest first which takes $O(\log |X|)$ span. 
-        - If memoization was used, each subproblem could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems which is just $|X| + N$, so $S(n) = O(|X| + N)$
-        - In total, $S(n) = O(\log |X| + |X| + N) = O(|X| + N)$. 
+        - Assume the denominations are already sorted highest to lowest.
+        - If memoization was used, each chain of subproblems could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems since these would have to be processed sequentially. 
+        - We reduce by at least one each time, either by one denomination in the cases where we can make change with our remaining dollars or by a set amount of dollars when we can't, so this is dependent on $|X|$ and $N$.
+        - In total, $S(n) = O(|X| + N)$.
 
 <br>
 
 - **5a.**  
-    - **Optimal Substructure**: Yes, the optimal substructure property still holds for weighted task selection. 
+    - **Optimal Substructure**: Let $OPT(A)$ be the optimal solution (earliest finishing task with maximum value) for any set of tasks, $A$. The optimal substructure is $OPT(A) = \max \{v(a) + OPT(A'), OPT(A-a)\}$ where $A'$ is the set of tasks that strictly come after $a$.
         - Let $A$ be the set of tasks to choose from sorted by the task that finish earliest to latest and assume you make an optimal choice, $a \in A$, for which task to choose.
         - The optimal solution, $O$, will be made up of $a$ and the optimal solution for the remaining tasks to choose from that are not $a$ and do not overlap with $a$. 
         - Suppose, $O$ was not optimal and that some other solution, $O'$, is. 
         - If $a$ is in the optimal solution, however, it has to be in $O'$. But if $a$ is $O'$, you get the same remaining tasks as before and the same set of subproblems since tasks cannot overlap. 
-        - Therefore, same as before, $O = O'$ and an optimal solution can be created from the optimal solutions to smaller subproblems.
-    - Let $OPT(A)$ be the optimal solution (earliest finishing task with maximum value) for any set of tasks, $A$.
-        - The optimal substructure is $OPT(A) = \max \{v(a) + OPT(A'), OPT(A-a)\}$ where $A'$ is the set of tasks that strictly come after $a$. 
+        - Therefore, same as before, $O = O'$ and an optimal solution can be created from the optimal solutions to smaller subproblems. 
 
 
 - **5b.** No, the greedy criterion does not hold. For the two examples below, let $A$ represent a set of tasks with start time ($s$), finish time ($f$), and value ($v$) such that $A = \{(s_0, f_0, v_0), (s_1, f_1, v_1), ..., (s_i, f_i, v_i)\}$.
     - **Greedy Criteria 1**: Pick the task with the maximum value. 
         - Let $A = \{(s=0, f=2, v=2), (s=2, f=3, v=1), (s=3, f=5, v=2), (s=5, f=7, v=3), (s=0, f=7, v=4)\}$
-        - The greedy choice would choose the last task, $(s=0, f=7, v=4)$, which overlaps with all other task allowing for no other choice and yielding a value of 4. 
-        - The optimal solution would have been picking the rest of the set since that would yield values $2+1+2+3=8$.
+        - The *greedy choice* would choose the last task, $(s=0, f=7, v=4)$, which overlaps with all other task allowing for no other choice and yielding a value of 4. 
+        - The *optimal solution* would have been picking the rest of the set since they do not overlap with one another and would yield values $2+1+2+3=8$.
         - Therefore, just picking the task with the maximum value will not work. 
     - **Greedy Criteria 2**: Pick the task that finishes the earliest with the maximum value. 
         - Let $A = \{(s=0, f=2, v=2), (s=0, f=2, v=1), (s=3, f=5, v=1), (s=5, f=7, v=1), (s=0, f=7, v=6)\}$. 
-        - The greedy choice would choose $\{(s=0, f=2, v=2), (s=3, f=5, v=1), (s=5, f=7, v=1)\}$.
-        - The optimal solution would have been picking the the last task, $(s=0, f=7, v=6)$, since $6 > 2+1+1$. 
+        - The *greedy choice* would choose $\{(s=0, f=2, v=2), (s=3, f=5, v=1), (s=5, f=7, v=1)\}$, which yields value of 4.
+        - The *optimal solution* would have been picking the the last task, $(s=0, f=7, v=6)$, which yields a value of 6.
         - Therefore, just picking the task that finishes first with the highest value will not work, either. 
 
 - **5c.**
@@ -233,5 +231,5 @@ Place all written answers from `problemset-04.md` here for easier grading.
         - In total, $W(n) = O(n \log n + n) = O(n \log n)$
     - **Span Analysis**: The span is $O(n)$ 
         - Similar to the work, the tasks must be sorted by finish time first which takes $O(\log n)$ span. 
-        - If memoization was used, each subproblem could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems which is just $|A|$, so $S(n) = O(|A|) = O(n)$.
+        - If memoization was used, each subproblem could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems which is just $|A|$ since we reduce by one task each time. So, $S(n) = O(|A|) = O(n)$.
         - In total, $S(n) = O(\log n + n) = O(n)$. 
