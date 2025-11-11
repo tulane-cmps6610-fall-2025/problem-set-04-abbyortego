@@ -141,12 +141,13 @@ Place all written answers from `problemset-04.md` here for easier grading.
 
 - **4b.**
     - **Optimal Substructure**: This problem still has optimal substructure since an optimal solution for this problem can be constructed from smaller subproblems.
-        - Similar to the proof above, assume you make an optimal choice, $x$, for which denomination to use. The optimal solution, $O$, will be made up of $x$ and the optimal solution for the remaining amount of dollars to exchange, $N-x$.
+        - Similar to the proof above, let $X$ equal the set of possible denominations and assume you make an optimal choice, $x \in X$, for which denomination to use. 
+        - The optimal solution, $O$, will be made up of $x$ and the optimal solution for the remaining amount of dollars to exchange, $N-x$.
         - Suppose, $O$ was not optimal and that some other solution, $O'$, is. 
         - If $x$ is in the optimal solution, however, it has to be in $O'$. But if $x$ is $O'$, you get the same remainder as before and the same set of subproblems. 
         - Therefore, same as before, $O = O'$ and an optimal solution can be created from the optimal solutions to smaller subproblems.
     - Let $OPT(X, N)$ be the optimal solution (smallest number of coins) for any set of denominations, $X$, and any dollar amount, $N$.
-        - The optimal substructure is $OPT(X, N) = \min \{1 + OPT(X[1:], N-X[0]), OPT(X[1:], N)\} $.
+        - The optimal substructure is $OPT(X, N) = \min \{1 + OPT(X[1:], N-X[0]), OPT(X[1:], N)\}$.
 
 - **4c.**
     - Let $X$ be the set of possible choices for the number of coins or more precisely, the possible values of $k$. Let $N$ be the dollars to exchange for Fortuito's currency.
@@ -172,21 +173,65 @@ Place all written answers from `problemset-04.md` here for easier grading.
                 #
             #
         # dp_exchange_dollars
-    - **Work Analysis**: If memoization was used, each subproblem would be calculated sequentially in constant time and the two recursive calls could be looked-up. There are $O(|X| * N)$ subproblems so $W(n) = O(|X| * N)$. 
-    - **Span Analysis**: If memoization was used, each subproblem could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems which is just $|X| + N$, so $S(n) = O(|X| + N)$
+    - **Work Analysis**: The work is $O(|X| * N)$
+        - The denominations must be sorted by highest to lowest first which takes $O(|X| \log |X|)$ work.
+        - If memoization was used, each subproblem would be calculated sequentially in constant time and the two recursive calls could be looked-up. There are $O(|X| * N)$ subproblems so $W(n) = O(|X| * N)$.
+        - In total, $W(n) = O((|X|*\log |X|) + (|X|*N)) = O(|X| * N)$, assuming the dollars exchanged would end up exceeding the possible denominations.
+    - **Span Analysis**: The span is $O(|X| + N)$
+        - Similar to the work, the denominations must be sorted by highest to lowest first which takes $O(\log |X|)$ span. 
+        - If memoization was used, each subproblem could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems which is just $|X| + N$, so $S(n) = O(|X| + N)$
+        - In total, $S(n) = O(\log |X| + |X| + N) = O(|X| + N)$. 
 
 <br>
 
 - **5a.**  
-    - **Optimal Substructure**: Yes, the optimal substructure property still holds for weighted task selection. Assume you make an optimal choice, $a$, for which task in $A$ to choose. The optimal solution, $O$, will be made up of $a$ and the optimal solution for the remaining amount of dollars to exchange, $N-x$.
+    - **Optimal Substructure**: Yes, the optimal substructure property still holds for weighted task selection. 
+        - Let $A$ be the set of tasks to choose from sorted by the task that finish earliest to latest and assume you make an optimal choice, $a \in A$, for which task to choose.
+        - The optimal solution, $O$, will be made up of $a$ and the optimal solution for the remaining tasks to choose from that are not $a$ and do not overlap with $a$. 
         - Suppose, $O$ was not optimal and that some other solution, $O'$, is. 
-        - If $x$ is in the optimal solution, however, it has to be in $O'$. But if $x$ is $O'$, you get the same remainder as before and the same set of subproblems. 
+        - If $a$ is in the optimal solution, however, it has to be in $O'$. But if $a$ is $O'$, you get the same remaining tasks as before and the same set of subproblems since tasks cannot overlap. 
         - Therefore, same as before, $O = O'$ and an optimal solution can be created from the optimal solutions to smaller subproblems.
+    - Let $OPT(A)$ be the optimal solution (earliest finishing task with maximum value) for any set of tasks, $A$.
+        - The optimal substructure is $OPT(A) = \max \{v(a) + OPT(A'), OPT(A-a)\}$ where $A'$ is the set of tasks that strictly come after $a$. 
 
 
-- **5b.**
-
-
-
+- **5b.** No, the greedy criterion does not hold. For the two examples below, let $A$ represent a set of tasks with start time ($s$), finish time ($f$), and value ($v$) such that $A = \{(s_0, f_0, v_0), (s_1, f_1, v_1), ..., (s_i, f_i, v_i)\}$.
+    - **Greedy Criteria 1**: Pick the task with the maximum value. 
+        - Let $A = \{(s=0, f=2, v=2), (s=2, f=3, v=1), (s=3, f=5, v=2), (s=5, f=7, v=3), (s=0, f=7, v=4)\}$
+        - The greedy choice would choose the last task, $(s=0, f=7, v=4)$, which overlaps with all other task allowing for no other choice and yielding a value of 4. 
+        - The optimal solution would have been picking the rest of the set since that would yield values $2+1+2+3=8$.
+        - Therefore, just picking the task with the maximum value will not work. 
+    - **Greedy Criteria 2**: Pick the task that finishes the earliest with the maximum value. 
+        - Let $A = \{(s=0, f=2, v=2), (s=0, f=2, v=1), (s=3, f=5, v=1), (s=5, f=7, v=1), (s=0, f=7, v=6)\}$. 
+        - The greedy choice would choose $\{(s=0, f=2, v=2), (s=3, f=5, v=1), (s=5, f=7, v=1)\}$.
+        - The optimal solution would have been picking the the last task, $(s=0, f=7, v=6)$, since $6 > 2+1+1$. 
+        - Therefore, just picking the task that finishes first with the highest value will not work, either. 
 
 - **5c.**
+    - Let $A$ be the set of tasks to choose from sorted by earliest finish time. 
+        - ```python
+            def dp_weighted_task_sel(A):
+                # base cases:
+                if len(A) == 0:   # no more tasks to choose from
+                    return 0
+                # recursive cases:
+                else:
+                    if len(A) > 0:      # there are tasks to choose from
+                        our_a = A[0]
+                        non_overlap_A = a in A that does not overlap with our_a
+                        without_A = A with our_A removed
+                        
+                        run = our_a["v"] + dp_weighted_task_sel(non_overlap_A)
+                        dont_run = 0 + dp_weighted_task_sel(without_A)
+                        return max(run, dont_run)
+                    #
+                #
+            # dp_weighted_task_sel
+    - **Work Analysis**: The work is $O(n \log n)$
+        - The tasks must be sorted by finish time first which takes $O(n \log n)$ work.
+        - If memoization was used, each subproblem would be calculated sequentially in constant time and the two recursive calls could be looked-up. There are $O(|A|)$ subproblems so $W(n) = O(|A|) = (n)$. 
+        - In total, $W(n) = O(n \log n + n) = O(n \log n)$
+    - **Span Analysis**: The span is $O(n)$ 
+        - Similar to the work, the tasks must be sorted by finish time first which takes $O(\log n)$ span. 
+        - If memoization was used, each subproblem could be calculated in parallel. The span would then just be the longest sequence of dependent subproblems which is just $|A|$, so $S(n) = O(|A|) = O(n)$.
+        - In total, $S(n) = O(\log n + n) = O(n)$. 
